@@ -1,6 +1,6 @@
-# DevTinder Backend
+# DevLinkUp Backend
 
-DevTinder is a platform designed to connect developers based on their skill sets, projects, and interests. This repository contains the backend logic that powers the matching algorithm, user profiles, and communication features.
+DevLinkUp is a platform designed to connect developers based on their skill sets, projects, and interests. This repository contains the backend logic that powers the matching algorithm, user profiles, and communication features.
 
 ## Table of Contents
 
@@ -19,7 +19,7 @@ DevTinder is a platform designed to connect developers based on their skill sets
 - **Real-time Chat**: Allows developers to communicate with each other directly via real-time messaging.
 - **Project Collaboration**: Propose and join development projects with other users.
 - **Authentication**: Secure login and signup via email/password or OAuth providers.
-  
+
 ## Tech Stack
 
 - **Node.js**: Backend runtime environment.
@@ -36,8 +36,8 @@ To get the backend up and running locally, follow these steps:
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/KhalkarYash/devtinder-backend.git
-   cd devtinder-backend
+   git clone https://github.com/KhalkarYash/dev-link-up-backend.git
+   cd dev-link-up-backend
    ```
 
 2. **Install dependencies**:
