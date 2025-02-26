@@ -3,21 +3,67 @@ const express = require("express");
 const app = express();
 const { connectDB } = require("./config/database");
 const User = require("./models/user");
+const { validateSignUpData } = require("./utils/validation");
+const bcrypt = require("bcrypt");
 
 app.use(express.json());
 
-app.post("/signup", async (req, res) => {
-  // Creating a new instance of the user model
-  const user = new User(req.body);
-
+app.post("/login", async (req, res) => {
   try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error("Invalid Credentials!");
+    }
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      throw new Error("Invalid Credentials!");
+    }
+    res.send("User Logged In Successfully!");
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
+  }
+});
+
+app.post("/signup", async (req, res) => {
+  try {
+    // Validation of data
+    validateSignUpData(req);
+
+    // Encrypt the password
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      about,
+      skills,
+      photoUrl,
+      gender,
+      age,
+    } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Creating a new instance of the user model
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      about,
+      skills,
+      photoUrl,
+      gender,
+      age,
+    });
+
     await user.save();
     res.send("User added successfully!");
   } catch (error) {
     if (error.code === 11000) {
       res.status(400).send("Email already exists");
     } else {
-      res.status(400).send("Error occurred" + error.message);
+      res.status(400).send("ERROR : " + error.message);
     }
   }
 });
@@ -99,7 +145,7 @@ connectDB()
     console.log("Database connection established...");
     const PORT = process.env.PORT;
     app.listen(PORT, () => {
-      console.log("Server is running on port "+ PORT);
+      console.log("Server is running on port " + PORT);
     });
   })
   .catch(() => {
