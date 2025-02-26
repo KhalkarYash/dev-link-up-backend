@@ -17,7 +17,7 @@ app.post("/signup", async (req, res) => {
     if (error.code === 11000) {
       res.status(400).send("Email already exists");
     } else {
-      res.status(400).send("Error occurred");
+      res.status(400).send("Error occurred" + error.message);
     }
   }
 });
@@ -59,10 +59,31 @@ app.delete("/user", async (req, res) => {
 });
 
 // Update a user from the database
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const data = req.body;
+
   try {
+    const ALLOWED_UPDATES = [
+      "userId",
+      "photoUrl",
+      "about",
+      "gender",
+      "age",
+      "skills",
+    ];
+
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+
+    if (!isUpdateAllowed) {
+      throw new Error("Update not allowed");
+    }
+    if (data?.skills.length > 10) {
+      throw new Error("Skills can't be more than 10");
+    }
+
     const users = await User.findByIdAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
       runValidators: true,
@@ -76,9 +97,9 @@ app.patch("/user", async (req, res) => {
 connectDB()
   .then(() => {
     console.log("Database connection established...");
-
-    app.listen(7777, () => {
-      console.log("Server is running on port 7777");
+    const PORT = process.env.PORT;
+    app.listen(PORT, () => {
+      console.log("Server is running on port "+ PORT);
     });
   })
   .catch(() => {
