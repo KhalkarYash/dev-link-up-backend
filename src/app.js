@@ -17,7 +17,7 @@ app.post("/signup", async (req, res) => {
     if (error.code === 11000) {
       res.status(400).send("Email already exists");
     } else {
-      res.status(400).send("Error occurred: " + err.message);
+      res.status(400).send("Error occurred");
     }
   }
 });
@@ -63,10 +63,13 @@ app.patch("/user", async (req, res) => {
   const userId = req.body.userId;
   const data = req.body;
   try {
-    const users = await User.findByIdAndUpdate({ _id: userId }, data);
+    const users = await User.findByIdAndUpdate({ _id: userId }, data, {
+      returnDocument: "after",
+      runValidators: true,
+    });
     res.send("User Updated Successfully!");
   } catch (err) {
-    res.status(400).send("Something went wrong");
+    res.status(400).send("Update Failed! " + err.message);
   }
 });
 
