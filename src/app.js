@@ -8,7 +8,14 @@ const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const { userAuth } = require("./middlewares/auth");
+const cors = require("cors");
 
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -62,7 +69,7 @@ app.post("/login", async (req, res) => {
     if (!user) {
       throw new Error("Invalid Credentials!");
     }
-    const isValidPassword = await user.validatePassword(password)
+    const isValidPassword = await user.validatePassword(password);
     if (!isValidPassword) {
       throw new Error("Invalid Credentials!");
     }
@@ -71,7 +78,20 @@ app.post("/login", async (req, res) => {
     res.cookie("token", token, {
       expires: new Date(Date.now() + 7 * 24 * 3600000),
     });
-    res.send("User Logged In Successfully!");
+    res.send(user);
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
+  }
+});
+
+app.delete("/logout", (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+    });
+    res.status(200).send("Logged out successfully!");
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
   }
