@@ -68,17 +68,17 @@ authRouter.post("/login", async (req, res) => {
   }
 });
 
-authRouter.post("/logout", async (req, res) => {
-  try {
-    res
-      .cookie("token", null, {
-        expires: new Date(Date.now()),
-      })
-      .json({ message: "Logged out successfully!" });
-  } catch (err) {
-    res.status(400).json({ message: "ERROR: " + err.message });
-  }
-});
+// authRouter.post("/logout", async (req, res) => {
+//   try {
+//     res
+//       .cookie("token", null, {
+//         expires: new Date(Date.now()),
+//       })
+//       .json({ message: "Logged out successfully!" });
+//   } catch (err) {
+//     res.status(400).json({ message: "ERROR: " + err.message });
+//   }
+// });
 
 authRouter.delete("/logout", async (req, res) => {
   try {
