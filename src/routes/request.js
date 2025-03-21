@@ -68,4 +68,41 @@ requestRouter.post(
   }
 );
 
+requestRouter.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.user;
+      const { status, requestId } = req.params;
+
+      const allowedStatus = ["accepted", "rejected"];
+
+      // If status is valid or not
+      if (!allowedStatus.includes(status)) {
+        return res
+          .status(400)
+          .json({ message: "Invalid status type: " + status });
+      }
+
+      // If requestId is random MongoDB ObjectId
+      const connectionRequest = await ConnectionRequest.findOne({
+        fromUserId: requestId,
+        toUserId: loggedInUser._id,
+        status: "interested",
+      });
+      if (!connectionRequest) {
+        return res.status(400).json({ message: "Invalid request ID!" });
+      }
+
+      connectionRequest.status = status;
+      const data = await connectionRequest.save();
+
+      res.json({ message: "Connection Request " + status + "!", data });
+    } catch (err) {
+      res.status(400).json({ message: "ERROR: " + err.message });
+    }
+  }
+);
+
 module.exports = requestRouter;
