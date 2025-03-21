@@ -63,7 +63,7 @@ requestRouter.post(
         res.json({ message: "Connection Request sent successfully!" });
       }
     } catch (err) {
-      res.status(400).send("ERROR: " + err.message);
+      res.status(400).json({ message: "ERROR: " + err.message });
     }
   }
 );

@@ -37,12 +37,12 @@ authRouter.post("/signup", async (req, res) => {
     });
 
     await user.save();
-    res.send("User added successfully!");
+    res.json({ message: "User added successfully!" });
   } catch (error) {
     if (error.code === 11000) {
-      res.status(400).send("Email already exists");
+      res.status(400).json({ message: "Email already exists" });
     } else {
-      res.status(400).send("ERROR : " + error.message);
+      res.status(400).json({ message: "ERROR : " + error.message });
     }
   }
 });
@@ -62,9 +62,9 @@ authRouter.post("/login", async (req, res) => {
     res.cookie("token", token, {
       expires: new Date(Date.now() + 7 * 24 * 3600000),
     });
-    res.send(user);
+    res.json({ data: user });
   } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
+    res.status(400).json({ message: "ERROR: " + err.message });
   }
 });
 
@@ -74,9 +74,9 @@ authRouter.post("/logout", async (req, res) => {
       .cookie("token", null, {
         expires: new Date(Date.now()),
       })
-      .send("Logged out successfully!");
+      .json({ message: "Logged out successfully!" });
   } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
+    res.status(400).json({ message: "ERROR: " + err.message });
   }
 });
 
@@ -87,9 +87,9 @@ authRouter.delete("/logout", async (req, res) => {
       sameSite: "None",
       secure: true,
     });
-    res.send("Logged out successfully!");
+    res.json({ message: "Logged out successfully!" });
   } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
+    res.status(400).json({ message: "ERROR: " + err.message });
   }
 });
 

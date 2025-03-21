@@ -13,20 +13,47 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
     const requests = await ConnectionRequest.find({
       $and: [{ status: "interested" }, { toUserId: user._id }],
     }).populate("fromUserId", USER_SAFE_DATA);
-    res.send({ data: requests });
+    res.json({ data: requests });
   } catch (err) {
     res.status(400).json({ message: "ERROR: " + err.message });
   }
 });
 
-// Get all the users
+// Get all the other users
 userRouter.get("/user/feed", userAuth, async (req, res) => {
-  const excludedUserId = req.user._id;
+  const user = req.user;
+  const page = parseInt(req.query.page) || 1;
+  let limit = parseInt(req.query.limit) || 10;
+  limit = limit > 50 ? 50 : limit;
+
   try {
-    const allUsers = await User.find({ _id: { $ne: excludedUserId } }).select(
-      "-password"
-    );
-    res.send({ data: allUsers });
+    // User should see all the cards except
+    // 0. himself/herself
+    // 1. his connections
+    // 2. ignored people
+    // 3. already sent the connection request to
+
+    const connectionRequests = await ConnectionRequest.find({
+      $or: [{ fromUserId: user._id }, { toUserId: user._id }],
+    }).select("fromUserId toUserId");
+
+    const hideUsersFromFeed = new Set();
+    connectionRequests.forEach((req) => {
+      hideUsersFromFeed.add(req.fromUserId.toString());
+      hideUsersFromFeed.add(req.toUserId.toString());
+    });
+
+    const allUsers = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUsersFromFeed) } },
+        { _id: { $ne: user._id } },
+      ],
+    })
+      .select("-password -email")
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.json({ data: allUsers });
   } catch (err) {
     res.status(400).json({ message: "ERROR: " + err.message });
   }
