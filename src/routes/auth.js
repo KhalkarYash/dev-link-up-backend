@@ -36,8 +36,15 @@ authRouter.post("/signup", async (req, res) => {
       age,
     });
 
-    await user.save();
-    res.json({ message: "User added successfully!" });
+    const savedUser = await user.save();
+
+    const token = await savedUser.getJWT();
+
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 7 * 24 * 3600000),
+    });
+
+    res.json({ message: "User added successfully!", data: savedUser });
   } catch (error) {
     if (error.code === 11000) {
       res.status(400).json({ message: "Email already exists" });
