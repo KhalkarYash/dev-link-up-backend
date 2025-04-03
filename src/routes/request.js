@@ -2,6 +2,8 @@ const express = require("express");
 const requestRouter = express.Router();
 const { userAuth } = require("../middlewares/auth");
 const ConnectionRequest = require("../models/connectionRequest");
+const { run } = require("../utils/sendEmail");
+const User = require("../models/user");
 
 requestRouter.post(
   "/request/send/:status/:toUserId",
@@ -55,11 +57,15 @@ requestRouter.post(
         status,
       });
 
+      const toUser = await User.findOne({ _id: toUserId });
+
       const data = await connectionRequest.save();
+
       if (status === "ignored") {
         return res.json({ message: "Connection Request ignored!" });
       }
       if (status === "interested") {
+        const emailRes = await run(req.user.firstName, toUser.firstName);
         res.json({ message: "Connection Request sent successfully!" });
       }
     } catch (err) {
