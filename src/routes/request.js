@@ -65,7 +65,30 @@ requestRouter.post(
         return res.json({ message: "Connection Request ignored!" });
       }
       if (status === "interested") {
-        const emailRes = await run(req.user.firstName, toUser.firstName);
+        const emailRes = await run(
+          `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <title>New Connection Request</title>
+          </head>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+              <h2 style="color: #007bff;">You've Received a New Connection Request from ${toUser.firstName}!</h2>
+              <p>Hi there,</p>
+              <p><strong>${req.user.firstName}</strong> has sent you a connection request on <strong>DevLinkUp</strong>.</p>
+              <p>Expand your network by accepting the request and collaborating with like-minded developers.</p>
+              <p>If you don’t want to connect, you can simply ignore this email.</p>
+              <hr style="border: none; border-top: 1px solid #ddd;">
+              <p style="font-size: 12px; color: #666;">This is an automated email. Please do not reply.</p>
+            </div>
+          </body>
+          </html>
+        `,
+          "You've received a new connection request on DevLinkUp!",
+          toUser.email
+        );
         res.json({ message: "Connection Request sent successfully!" });
       }
     } catch (err) {

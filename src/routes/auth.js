@@ -3,6 +3,7 @@ const authRouter = express.Router();
 const { validateSignUpData } = require("../utils/validation");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const verifyEmail = require("../utils/verifyEmail");
 
 authRouter.post("/signup", async (req, res) => {
   try {
@@ -43,6 +44,9 @@ authRouter.post("/signup", async (req, res) => {
     res.cookie("token", token, {
       expires: new Date(Date.now() + 7 * 24 * 3600000),
     });
+
+    // Remove this when SES in production
+    await verifyEmail(email);
 
     res.json({ message: "User added successfully!", data: savedUser });
   } catch (error) {
