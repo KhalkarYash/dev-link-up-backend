@@ -10,9 +10,24 @@ const userRouter = require("./routes/user");
 const requestRouter = require("./routes/request");
 require("./utils/cronjobs");
 
+const isCrossOrigin = process.env.IS_CROSS_ORIGIN === "true";
+
+const keepAlive = () => {
+  setInterval(async () => {
+    try {
+      const response = await fetch(process.env.RenderURL);
+      console.log(
+        "Keep-alive ping sent to the server, status: " + response.status
+      );
+    } catch (error) {
+      console.error("Keep-alive ping failed: " + error);
+    }
+  }, 840000);
+};
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT,
     credentials: true,
   })
 );
@@ -31,6 +46,10 @@ connectDB()
     app.listen(PORT, () => {
       console.log("Server is running on port " + PORT);
     });
+
+    if (isCrossOrigin) {
+      keepAlive();
+    }
   })
   .catch(() => {
     console.log("Database cannot be connected!");

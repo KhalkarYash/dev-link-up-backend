@@ -5,6 +5,9 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const verifyEmail = require("../utils/verifyEmail");
 
+const isCrossOrigin = process.env.IS_CROSS_ORIGIN === "true";
+const isHTTPS = process.env.IS_HTTPS === "true";
+
 authRouter.post("/signup", async (req, res) => {
   try {
     // Validation of data
@@ -42,7 +45,10 @@ authRouter.post("/signup", async (req, res) => {
     const token = await savedUser.getJWT();
 
     res.cookie("token", token, {
-      expires: new Date(Date.now() + 7 * 24 * 3600000),
+      httpOnly: true,
+      secure: isHTTPS,
+      sameSite: isCrossOrigin ? "None" : undefined,
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
     // Remove this when SES in production
@@ -71,7 +77,10 @@ authRouter.post("/login", async (req, res) => {
     }
     const token = await user.getJWT();
     res.cookie("token", token, {
-      expires: new Date(Date.now() + 7 * 24 * 3600000),
+      httpOnly: isCrossOrigin,
+      secure: isCrossOrigin,
+      sameSite: isCrossOrigin ? "None" : undefined,
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
     res.json({ data: user });
   } catch (err) {
@@ -82,7 +91,10 @@ authRouter.post("/login", async (req, res) => {
 authRouter.post("/logout", async (req, res) => {
   try {
     res
-      .cookie("token", null, {
+      .cookie("token", "", {
+        httpOnly: isCrossOrigin,
+        secure: isCrossOrigin,
+        sameSite: isCrossOrigin ? "None" : undefined,
         expires: new Date(Date.now()),
       })
       .json({ message: "Logged out successfully!" });

@@ -68,16 +68,3 @@ cron.schedule("9 3 * * *", async () => {
     console.error(err);
   }
 });
-
-const CRON_SCHEDULE_DUCKDNS = "*/5 * * * *";
-
-/*cron.schedule(CRON_SCHEDULE_DUCKDNS, async () => {
-  try {
-    const response = await axios.get(
-      `https://www.duckdns.org/update?domains=${process.env.DUCKDNS_DOMAIN}&token=${process.env.DUCKDNS_TOKEN}&ip=`
-    );
-    console.log("DuckDNS Updated:", response.data);
-  } catch (error) {
-    console.error("Error updating DuckDNS:", error);
-  }
-});*/
