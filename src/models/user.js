@@ -57,9 +57,17 @@ const userSchema = new mongoose.Schema(
       //   }
       // },
     },
+    isPremium: {
+      type: Boolean,
+      default: false,
+    },
+    membershipType: {
+      type: String,
+    },
     photoUrl: {
       type: String,
-      default: "https://www.vhv.rs/dpng/d/550-5508649_person-image-placeholder-clipart-png-download-no-profile.png",
+      default:
+        "https://www.vhv.rs/dpng/d/550-5508649_person-image-placeholder-clipart-png-download-no-profile.png",
       validate(value) {
         if (!validator.isURL(value)) {
           throw new Error("Invalid Photo URL");
