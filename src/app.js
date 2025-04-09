@@ -12,6 +12,7 @@ const paymentRouter = require("./routes/payment");
 require("./utils/cronjobs");
 const http = require("http");
 const initializeSocket = require("./utils/socket");
+const chatRouter = require("./routes/chat");
 
 const isCrossOrigin = process.env.IS_CROSS_ORIGIN === "true";
 
@@ -45,6 +46,7 @@ app.use("/", profileRouter);
 app.use("/", userRouter);
 app.use("/", requestRouter);
 app.use("/", paymentRouter);
+app.use("/", chatRouter);
 
 connectDB()
   .then(() => {
