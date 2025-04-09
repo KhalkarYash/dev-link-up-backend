@@ -10,6 +10,8 @@ const userRouter = require("./routes/user");
 const requestRouter = require("./routes/request");
 const paymentRouter = require("./routes/payment");
 require("./utils/cronjobs");
+const http = require("http");
+const initializeSocket = require("./utils/socket");
 
 const isCrossOrigin = process.env.IS_CROSS_ORIGIN === "true";
 
@@ -25,6 +27,9 @@ const keepAlive = () => {
     }
   }, 840000);
 };
+
+const server = http.createServer(app);
+initializeSocket(server);
 
 app.use(
   cors({
@@ -45,7 +50,7 @@ connectDB()
   .then(() => {
     console.log("Database connection established...");
     const PORT = process.env.PORT;
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log("Server is running on port " + PORT);
     });
 
