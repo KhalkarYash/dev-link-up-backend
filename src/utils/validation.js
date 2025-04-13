@@ -29,11 +29,15 @@ const validateProfileData = (req) => {
   return isEditAllowed;
 };
 
-const validatePasswordData = (req) => {
+const validatePasswordData = (req, password) => {
   const allowedEditFields = ["password"];
   const isEditAllowed = Object.keys(req.body).every((field) =>
     allowedEditFields.includes(field)
   );
+
+  if (!validator.isStrongPassword(password)) {
+    throw new Error("Please enter a strong password!");
+  }
 
   return isEditAllowed;
 };

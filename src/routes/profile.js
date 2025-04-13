@@ -35,8 +35,9 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
 });
 
 profileRouter.patch("/profile/password", userAuth, async (req, res) => {
+  const { password } = req.body;
   try {
-    if (!validatePasswordData(req)) {
+    if (!validatePasswordData(req, password)) {
       throw new Error("Invalid Edit Request!");
     }
 
@@ -52,6 +53,7 @@ profileRouter.patch("/profile/password", userAuth, async (req, res) => {
       data: user,
     });
   } catch (err) {
+    console.log(err);
     res.status(400).json({ message: "ERROR: " + err.message });
   }
 });
