@@ -14,30 +14,20 @@ const http = require("http");
 const initializeSocket = require("./utils/socket");
 const chatRouter = require("./routes/chat");
 
-const isCrossOrigin = process.env.IS_CROSS_ORIGIN === "true";
-
-const keepAlive = () => {
-  setInterval(async () => {
-    try {
-      const response = await fetch(process.env.RenderURL);
-      console.log(
-        "Keep-alive ping sent to the server, status: " + response.status
-      );
-    } catch (error) {
-      console.error("Keep-alive ping failed: " + error);
-    }
-  }, 840000);
-};
-
 const server = http.createServer(app);
 initializeSocket(server);
 
-app.use(
-  cors({
-    origin: process.env.CLIENT,
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: process.env.CLIENT,
+  methods: "GET,POST,PATCH,PUT,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type,Authorization,X-Requested-With,Accept",
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -55,10 +45,6 @@ connectDB()
     server.listen(PORT, () => {
       console.log("Server is running on port " + PORT);
     });
-
-    if (isCrossOrigin) {
-      keepAlive();
-    }
   })
   .catch(() => {
     console.log("Database cannot be connected!");
